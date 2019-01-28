@@ -1,0 +1,42 @@
+version: '2'
+
+services:
+  web:
+    extends:
+      file: common-compose.yml
+      service: base
+    ports:
+      - 8888
+    command: "python app.py"
+    mem_limit: '256M'
+    memswap_limit: '256M'
+    mem_reservation: '256M'
+    links:
+      - redis
+
+  celery:
+    extends:
+      file: common-compose.yml
+      service: base
+    command: "celery -A info_engine worker -c 20 -l info"
+    mem_limit: '1024M'
+    memswap_limit: '1024M'
+    mem_reservation: '512M'
+    links:
+      - redis
+
+  engine:
+    extends:
+      file: common-compose.yml
+      service: base
+    command: "python info_engine.py"
+    mem_limit: '256M'
+    memswap_limit: '256M'
+    mem_reservation: '256M'
+    links:
+      - redis
+
+  redis:
+    image: redis
+    expose:
+      - 6379
